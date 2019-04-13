@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lab 5</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        svg {
+          border: 3px solid #eee;
+          display: block;
+          margin: 1em auto;
+        }
+        p {
+          color: #aaa;
+          text-align: center;
+          margin: 2em 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="../../index.html">Home</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="../../index.html">Labs</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="../../guides.html">Guides</a>
+                    </li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-secondary my-2 my-sm-0" type="submit">PUSH</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <div class="container" style="margin-top:5em;">
+        <h1>SVG-animation</h1>
+        <br>
+        <svg width="500" height="350">
+            <line x1="250" y1="0" x2="250" y2="350" stroke-width="1" stroke="rgb(0,0,0)"/>
+            <line x1="250" y1="0" x2="245" y2="10" stroke-width="1" stroke="rgb(0,0,0)"/>
+            <line x1="250" y1="0" x2="255" y2="10" stroke-width="1" stroke="rgb(0,0,0)"/>
+
+            <line x1="0" y1="175" x2="500" y2="175" stroke-width="1" stroke="rgb(0,0,0)"/>
+            <line x1="495" y1="175" x2="480" y2="180" stroke-width="1" stroke="rgb(0,0,0)"/>
+            <line x1="495" y1="175" x2="480" y2="170" stroke-width="1" stroke="rgb(0,0,0)"/>
+            <text x="235" y="15" fill="black">y</text>
+            <text x="480" y="195" fill="black">x</text>
+            <defs>
+                <path id="thepath" fill="none" stroke="#000000" d="M0.905,0.643c0,0,71.428,73.809,79.047,166.19s68.095,38.572,107.144-18.095c39.047-56.667,72.381-92.382,113.333-42.381S335.5,178.5,374,200.5s82-18.5,97.5-33.5"/>
+            </defs>
+            <circle r="15" cx="15" cy="15" fill="slategrey">
+                <animateMotion dur="3s" repeatCount="indefinite">
+                    <mpath xlink:href="#thepath"/>
+                </animateMotion>
+
+        </svg>
+
+        <div class="ball"></div>
+        <svg width="500" height="350">
+          <circle id="red-circle" r="50" cx="100" cy="100" fill="red" />
+
+          <animate 
+                   xlink:href="#red-circle"
+                   attributeName="cy"
+                   from="50"
+                   to="350" 
+                   dur="3s"
+                   begin="click"
+                   calcMode="spline"
+                   values="50; 294; 120; 294; 170; 294; 210; 294"
+                   keyTimes="0; 0.15; 0.3; 0.45; 0.6; 0.75; 0.9; 1"
+                   keySplines="0.6 0 1 1;
+                               0 0 0.8 1;
+                               0.6 0 1 1;
+                               0 0 0.8 1;
+                               0.6 0 1 1;
+                               0 0 0.8 1;
+                               0.6 0 1 1;"
+                   fill="freeze"  
+                   id="circ-anim"/>
+
+        </svg>
+        <p>Нажvите на круг, чтобы запустить анимацию.</p>
+
+        <svg width="500" height="350">
+          <rect id="p-rectangle" width="50" height="50" x="25" y="200" fill="purple"></rect>
+          <animate 
+           xlink:href="#p-rectangle"
+           attributeName="x" 
+           from="50"
+           to="425" 
+           dur="3s"
+           begin="0s"
+           repeatCount="indefinite"
+           fill="freeze" 
+           id="rect-anim"/>
+        </svg>
+
+
+
+</body>
+</html>
