@@ -1,0 +1,242 @@
+@font-face{
+
+font-family: "Raleway Regular";
+
+src: url('../fonts/raleway_thin-webfont.eot');
+
+src: url('../fonts/raleway_thin-webfont.eot?iefix') format('eot'),
+
+url('../fonts/raleway_thin-webfont.woff') format('woff'),
+
+url('../fonts/raleway_thin-webfont.ttf') format('truetype'),
+
+url('../fonts/raleway_thin-webfont.svg#webfont') format('svg');
+
+font-weight: normal;
+
+font-style: normal;
+
+}
+
+header {
+	background-color: #F4F4F4;
+	background: linear-gradient( rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6) ), url('../img/banner.jpg');
+    background-position:center top;
+	color: #fff;
+    font-family: "Raleway",Raleway,"Raleway Regular", Sans-serif;
+}
+
+hr {
+	margin: 3px 0;
+}
+.header__h1 {
+	padding-top: 10px;
+	font-size: 14vw;
+	font-weight: 900;
+	line-height: 1;
+}
+.header__h3 {
+	margin-top: 70px;
+	margin-bottom: 45px;
+	font-weight: 600;
+	letter-spacing: -2px;
+}
+.header__h5 {
+	font-size: 4.5vw;
+	font-weight: 300;
+	margin-top: 20px;
+}
+.header__p {
+	font-size: 1.6em;
+	margin-bottom: 8vh;
+}
+.header__p > strong {
+	font-family: sans-serif;
+	font-size: 50px;
+	font-weight: bolder;
+}
+.header__button-getwork {
+	margin: 0 auto;
+	margin-bottom: 40px;
+	padding: 15px 25px;
+	border-style: none;
+	background-color: #003579;
+	color: #FFF;
+	font-weight: 900;
+}
+
+.rabotodateli {
+	display: block;
+	padding-bottom: 40px;
+}
+.zagolovok {
+	font-size: 1.6em;
+	padding-top: 40px;
+	margin-bottom: 20px;
+	color: #003579;
+}
+.podzagolovok {
+	font-size: 1.2em;
+	font-weight: 300;
+	text-align: center;
+	padding-bottom: 20px;
+}
+.ave {
+	
+}
+.ave > div {
+	margin: 7px 0;
+}
+.ave > div > div {
+	font-weight: 600;
+}
+.rabotodateli-iconka {
+	display: block;
+	margin: 0 auto;
+	width: 50px;
+	height: 50px;
+	background-repeat: no-repeat;
+
+}
+.icon-one {
+	background-image: url(../img/1.webp);
+}
+.icon-two {
+	background-image: url(../img/2.webp);
+}
+.icon-three {
+	background-image: url(../img/3.webp);
+}
+.icon-four {
+	background-image: url(../img/4.webp);
+}
+.icon-five {
+	background-image: url(../img/5.webp);
+}
+.icon-six {
+	background-image: url(../img/6.webp);
+}
+
+.uslovia {
+	min-height: 400px;
+	padding-bottom: 40px;
+}
+
+.carousel-item__custom > img {
+	min-height: 250px;
+}
+
+
+.slaider__h3 {
+	width: 100%;
+	background-color: rgba(0,0,0,.6);
+	font-size: 1.4em;
+	font-weight: 600;
+	letter-spacing: 0px;
+	padding: 5px 3px;
+	margin-bottom: 20px;
+}
+.slaider__button {
+	padding: 10px 25px;
+	border: none;
+	background-color: #003875;
+	color: #FFF;
+	line-height: 1;
+	font-size: 1.2em;
+
+}
+
+.predlojenie {
+	background-image: linear-gradient( rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5) ),  url(https://www.iworkstudy.com/wp-content/uploads/2019/06/Izrail3.jpg);
+	background-repeat: no-repeat;
+	background-position: center;
+	color: #FFF;
+	padding-bottom: 40px;
+}
+
+.predlojenie > h3 {
+	color: #FFF;
+	font-size: 1.6em;
+	font-weight: 400;
+	padding-bottom: 3vh;
+}
+.predlojenie__item {
+	padding: 0 2vw;
+	font-size: 1.3em;
+	font-weight: 400;
+	text-align: center;
+
+}
+
+.fa-iconka {
+	margin: 10px auto;
+	text-align: center;
+}
+
+.rashodi {
+	background-color: #003875;
+	color: #FFF;
+	padding-bottom: 40px;
+}
+.rashodi > h3 {
+	color: #FFF;
+	font-size: 1.6em;
+	font-weight: 400;
+}
+.rashodi__item {
+	padding: 0 2vw;
+	font-size: 1.3em;
+	font-weight: 400;
+	text-align: center;
+}
+.faq {
+	text-align: center;
+	padding-bottom: 40px;
+}
+.faq__button-center {
+	margin: 0 auto;
+}
+
+.otzivi {
+	text-align: center;
+	padding-bottom: 40px;
+}
+.carousel-item__otziv > img {
+	border: 1px solid #003875
+}
+.carousel-item__otziv {
+	width: 100%;
+
+}
+
+.otziv__button-center {
+	margin-top: 20px;
+}
+
+footer {
+	background-color: #f4f4f4;
+}
+.img__msgs {
+	width: 90px;
+	height: 30px;
+}
+
+.footer__p-number {
+	margin-bottom: 0;
+	font-size: 1.4em;
+	font-weight: 600;
+}
+.email {
+	font-size: 1.4em;
+	margin: 20px 0;
+}
+.social {
+	margin-bottom: 20px;
+}
+.social-icon {
+	color: black;
+}
+.copyright {
+	padding: 20px 0;
+	margin-bottom: 0;
+}
