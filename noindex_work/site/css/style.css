@@ -37,7 +37,7 @@ hr {
 }
 .header__h3 {
 	margin-top: 50px;
-	margin-bottom: 25px;
+	margin-bottom: 20px;
 	font-weight: 600;
 	letter-spacing: -2px;
 }
@@ -48,7 +48,7 @@ hr {
 }
 .header__p {
 	font-size: 1.6em;
-	margin-bottom: 45px;
+	margin-bottom: 30px;
 }
 .header__p > strong {
 	font-family: sans-serif;
