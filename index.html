@@ -1,464 +1,693 @@
-﻿<!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Tetris Game</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Aleksei — Software Engineer" />
+  <title>Aleksei — Developer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-family: 'Arial', sans-serif;
-        }
+    :root {
+      --bg-void:        #030712;
+      --bg-surface:     #0a0f1e;
+      --bg-glass:       rgba(10, 15, 30, 0.65);
+      --cyan:           #00f5ff;
+      --cyan-dim:       #00b8c8;
+      --cyan-glow:      rgba(0, 245, 255, 0.15);
+      --purple:         #a855f7;
+      --war-red:        #ff3b3b;
+      --war-amber:      #ffd700;
+      --war-glow:       rgba(255, 59, 59, 0.2);
+      --price-up:       #22c55e;
+      --price-down:     #ef4444;
+      --text-primary:   #e2e8f0;
+      --text-secondary: #94a3b8;
+      --text-muted:     #475569;
+      --border-glass:   rgba(0, 245, 255, 0.1);
+      --border-hover:   rgba(0, 245, 255, 0.4);
+      --radius:         12px;
+      --radius-sm:      6px;
+      --t:              0.22s ease;
+    }
 
-        .game-container {
-            display: flex;
-            gap: 30px;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
+    html { scroll-behavior: smooth; }
 
-        .game-board {
-            border: 3px solid #00ff00;
-            background: #000;
-            width: 300px;
-            height: 600px;
-            position: relative;
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            grid-template-rows: repeat(20, 1fr);
-            gap: 0;
-        }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-void);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
 
-        .cell {
-            border: 1px solid #111;
-            background: #000;
-        }
+    /* ── Stars canvas ── */
+    #starsCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
 
-        .cell.filled {
-            background: #00ff00;
-            box-shadow: 0 0 10px #00ff00;
-        }
+    /* ── Layout ── */
+    .page {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 16px 48px;
+    }
 
-        .cell.falling {
-            background: #ffff00;
-            box-shadow: 0 0 10px #ffff00;
-        }
+    /* ── Header ── */
+    .site-header {
+      padding: 40px 0 28px;
+      border-bottom: 1px solid var(--border-glass);
+      margin-bottom: 28px;
+    }
+    .header-name {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .name-prefix {
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem;
+      color: var(--cyan-dim);
+      font-weight: 400;
+    }
+    .name-title {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(1.8rem, 6vw, 2.8rem);
+      font-weight: 900;
+      background: linear-gradient(90deg, var(--cyan) 0%, var(--purple) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.04em;
+    }
+    .header-tagline {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      letter-spacing: 0.08em;
+      font-weight: 300;
+    }
+    .cursor {
+      display: inline-block;
+      color: var(--cyan);
+      animation: blink 1s step-end infinite;
+      margin-right: 4px;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
 
-        .side-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            color: #00ff00;
-            font-size: 18px;
-            text-align: center;
-        }
+    /* ── Section base ── */
+    .section {
+      background: var(--bg-glass);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 18px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .section-label {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.63rem;
+      letter-spacing: 0.15em;
+      color: var(--cyan-dim);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+    .section-title {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(0.85rem, 2.5vw, 1.05rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 0.06em;
+    }
 
-        .info-box {
-            border: 2px solid #00ff00;
-            padding: 15px;
-            border-radius: 5px;
-            background: rgba(0, 255, 0, 0.1);
-        }
+    /* ── War Timer ── */
+    .war-section {
+      border-color: rgba(255, 59, 59, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+    .war-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top left, rgba(255,59,59,0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    @keyframes pulseBorder {
+      0%, 100% { border-color: rgba(255,59,59,0.22); }
+      50%       { border-color: rgba(255,59,59,0.52); }
+    }
+    .war-section { animation: pulseBorder 3s ease-in-out infinite; }
 
-        .info-box h3 {
-            margin-bottom: 10px;
-            font-size: 14px;
-            text-transform: uppercase;
-        }
+    .war-inner { position: relative; }
+    .war-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 2px;
+    }
+    .war-flag {
+      display: inline-block;
+      width: 28px;
+      height: 18px;
+      border-radius: 3px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.15);
+      flex-shrink: 0;
+      background: linear-gradient(180deg, #005BBB 50%, #FFD500 50%);
+    }
+    .war-title {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(1rem, 3.5vw, 1.3rem);
+      font-weight: 700;
+      color: var(--war-red);
+      text-shadow: 0 0 18px var(--war-glow);
+      letter-spacing: 0.05em;
+    }
+    .war-subtitle {
+      font-size: 0.77rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    .war-clock {
+      display: flex;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 2px 4px;
+      margin-bottom: 10px;
+    }
+    .war-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .war-value {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(1.6rem, 5.5vw, 2.5rem);
+      font-weight: 700;
+      color: var(--war-amber);
+      text-shadow: 0 0 16px rgba(255, 215, 0, 0.4);
+      line-height: 1;
+      letter-spacing: 0.02em;
+    }
+    .war-unit-label {
+      font-size: 0.58rem;
+      color: var(--text-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .war-div {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(1.2rem, 4vw, 1.9rem);
+      font-weight: 700;
+      color: var(--war-red);
+      opacity: 0.45;
+      line-height: 1;
+      padding-bottom: 18px;
+    }
+    .war-since {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+    }
 
-        .info-box p {
-            font-size: 24px;
-            font-weight: bold;
-        }
+    /* ── Crypto ── */
+    .crypto-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .crypto-status {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-family: 'Orbitron', monospace;
+      letter-spacing: 0.06em;
+    }
+    .crypto-status.ok    { color: var(--price-up); }
+    .crypto-status.error { color: var(--price-down); }
 
-        .next-piece {
-            border: 2px solid #00ff00;
-            padding: 15px;
-            border-radius: 5px;
-            background: rgba(0, 255, 0, 0.1);
-            width: 150px;
-            height: 150px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            gap: 2px;
-        }
+    .crypto-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 520px) {
+      .crypto-grid { grid-template-columns: repeat(3, 1fr); }
+    }
 
-        .next-piece .cell {
-            border: 1px solid #333;
-        }
+    .crypto-card {
+      background: rgba(5, 8, 20, 0.85);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      transition: border-color var(--t), transform var(--t);
+      position: relative;
+      overflow: hidden;
+    }
+    .crypto-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--cyan), var(--purple));
+      opacity: 0.45;
+    }
+    .crypto-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+    }
+    .crypto-symbol {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--cyan);
+      letter-spacing: 0.12em;
+      margin-bottom: 2px;
+    }
+    .crypto-name {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .crypto-price {
+      font-family: 'Orbitron', monospace;
+      font-size: clamp(0.95rem, 3vw, 1.15rem);
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: 0.01em;
+      margin-bottom: 4px;
+    }
+    .crypto-change {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+    .crypto-change.up      { color: var(--price-up); }
+    .crypto-change.down    { color: var(--price-down); }
+    .crypto-change.neutral { color: var(--text-muted); }
 
-        .controls {
-            border: 2px solid #00ff00;
-            padding: 15px;
-            border-radius: 5px;
-            background: rgba(0, 255, 0, 0.1);
-        }
+    /* skeleton */
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position:  400px 0; }
+    }
+    .skeleton .crypto-price,
+    .skeleton .crypto-change {
+      background: linear-gradient(90deg,
+        rgba(255,255,255,0.04) 25%,
+        rgba(255,255,255,0.09) 50%,
+        rgba(255,255,255,0.04) 75%);
+      background-size: 400px 100%;
+      animation: shimmer 1.4s infinite linear;
+      border-radius: 4px;
+      color: transparent !important;
+      min-width: 60px;
+      display: inline-block;
+    }
 
-        .controls p {
-            margin: 5px 0;
-            font-size: 14px;
-        }
+    /* ── Projects ── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    @media (min-width: 540px) {
+      .projects-grid { grid-template-columns: 1fr 1fr; }
+    }
 
-        button {
-            background: #00ff00;
-            color: #000;
-            border: none;
-            padding: 12px 25px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: all 0.3s;
-        }
+    .project-card {
+      background: rgba(5, 8, 20, 0.85);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      position: relative;
+      transition: border-color var(--t), transform var(--t), box-shadow var(--t);
+      cursor: default;
+    }
+    .project-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 0 22px var(--cyan-glow);
+    }
+    .project-index {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.58rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+    }
+    .project-name {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      letter-spacing: 0.04em;
+    }
+    .project-desc {
+      font-size: 0.77rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+      margin-bottom: 10px;
+    }
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .tag {
+      font-size: 0.63rem;
+      color: var(--cyan-dim);
+      border: 1px solid rgba(0, 245, 255, 0.18);
+      border-radius: 3px;
+      padding: 2px 7px;
+      letter-spacing: 0.06em;
+      font-weight: 500;
+    }
 
-        button:hover {
-            background: #ffff00;
-            box-shadow: 0 0 20px #ffff00;
-        }
-
-        button:active {
-            transform: scale(0.95);
-        }
-
-        .game-over {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.95);
-            color: #ff0000;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            font-size: 32px;
-            font-weight: bold;
-            z-index: 100;
-            display: none;
-        }
-
-        .game-over.show {
-            display: block;
-        }
-    </style>
+    /* ── Footer ── */
+    .site-footer {
+      text-align: center;
+      padding: 16px 0 4px;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-glass);
+      letter-spacing: 0.08em;
+    }
+    .site-footer em { font-style: normal; color: var(--cyan-dim); }
+  </style>
 </head>
 <body>
-    <div class="game-container">
-        <div class="game-board" id="gameBoard"></div>
-        
-        <div class="side-panel">
-            <div class="info-box">
-                <h3>Score</h3>
-                <p id="score">0</p>
-            </div>
 
-            <div class="info-box">
-                <h3>Level</h3>
-                <p id="level">1</p>
-            </div>
+<canvas id="starsCanvas" aria-hidden="true"></canvas>
 
-            <div class="info-box">
-                <h3>Lines</h3>
-                <p id="lines">0</p>
-            </div>
+<div class="page">
 
-            <div class="info-box">
-                <h3>Next</h3>
-            </div>
-
-            <div class="controls">
-                <p>← LEFT | RIGHT →</p>
-                <p>↓ DOWN | SPACE DROP</p>
-                <button onclick="game.togglePause()">PAUSE</button>
-                <button onclick="game.resetGame()">NEW GAME</button>
-            </div>
-        </div>
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-name">
+      <span class="name-prefix">//</span>
+      <h1 class="name-title">Aleksei</h1>
     </div>
+    <p class="header-tagline"><span class="cursor">_</span>software engineer &amp; builder</p>
+  </header>
 
-    <div class="game-over" id="gameOver">
-        <div>GAME OVER</div>
-        <div style="font-size: 18px; margin-top: 20px;">
-            Final Score: <span id="finalScore">0</span>
+  <main>
+
+    <!-- WAR TIMER -->
+    <section class="section war-section" id="war-timer" aria-label="Ukraine war timer">
+      <div class="war-inner">
+        <div class="section-label">// active conflict</div>
+        <div class="war-header">
+          <span class="war-flag" role="img" aria-label="Ukraine flag"></span>
+          <h2 class="war-title">Ukraine Resistance</h2>
         </div>
-    </div>
+        <p class="war-subtitle">Russian full-scale invasion &mdash; time elapsed</p>
+        <div class="war-clock" role="timer" aria-live="off">
+          <div class="war-unit">
+            <span class="war-value" id="warYears">--</span>
+            <span class="war-unit-label">yrs</span>
+          </div>
+          <span class="war-div" aria-hidden="true">:</span>
+          <div class="war-unit">
+            <span class="war-value" id="warDays">---</span>
+            <span class="war-unit-label">days</span>
+          </div>
+          <span class="war-div" aria-hidden="true">:</span>
+          <div class="war-unit">
+            <span class="war-value" id="warHours">--</span>
+            <span class="war-unit-label">hrs</span>
+          </div>
+          <span class="war-div" aria-hidden="true">:</span>
+          <div class="war-unit">
+            <span class="war-value" id="warMinutes">--</span>
+            <span class="war-unit-label">min</span>
+          </div>
+          <span class="war-div" aria-hidden="true">:</span>
+          <div class="war-unit">
+            <span class="war-value" id="warSeconds">--</span>
+            <span class="war-unit-label">sec</span>
+          </div>
+        </div>
+        <p class="war-since">Since 24 Feb 2022, 00:00 Kyiv time</p>
+      </div>
+    </section>
 
-    <script>
-        const COLS = 10;
-        const ROWS = 20;
-        const CELL_SIZE = 30;
+    <!-- CRYPTO RATES -->
+    <section class="section" id="crypto" aria-label="Crypto rates">
+      <div class="section-label">// market data</div>
+      <div class="crypto-header-row">
+        <h2 class="section-title">Crypto Rates</h2>
+        <span class="crypto-status" id="cryptoStatus">loading...</span>
+      </div>
+      <div class="crypto-grid" id="cryptoGrid">
+        <div class="crypto-card skeleton" id="coin-bitcoin">
+          <div class="crypto-symbol">BTC</div>
+          <div class="crypto-name">Bitcoin</div>
+          <div class="crypto-price">$——</div>
+          <div class="crypto-change neutral">—%</div>
+        </div>
+        <div class="crypto-card skeleton" id="coin-ethereum">
+          <div class="crypto-symbol">ETH</div>
+          <div class="crypto-name">Ethereum</div>
+          <div class="crypto-price">$——</div>
+          <div class="crypto-change neutral">—%</div>
+        </div>
+        <div class="crypto-card skeleton" id="coin-solana">
+          <div class="crypto-symbol">SOL</div>
+          <div class="crypto-name">Solana</div>
+          <div class="crypto-price">$——</div>
+          <div class="crypto-change neutral">—%</div>
+        </div>
+      </div>
+    </section>
 
-        const SHAPES = {
-            I: { color: '#00ccff', blocks: [[1, 1, 1, 1]] },
-            O: { color: '#ffff00', blocks: [[1, 1], [1, 1]] },
-            T: { color: '#cc00ff', blocks: [[0, 1, 0], [1, 1, 1]] },
-            L: { color: '#ff9900', blocks: [[1, 0], [1, 0], [1, 1]] },
-            J: { color: '#0066ff', blocks: [[0, 1], [0, 1], [1, 1]] },
-            S: { color: '#00ff00', blocks: [[0, 1, 1], [1, 1, 0]] },
-            Z: { color: '#ff0000', blocks: [[1, 1, 0], [0, 1, 1]] }
-        };
+    <!-- PROJECTS -->
+    <section class="section" id="projects" aria-label="Projects">
+      <div class="section-label">// selected work</div>
+      <h2 class="section-title">Projects</h2>
+      <div class="projects-grid">
 
-        class TetrisGame {
-            constructor() {
-                this.board = Array(ROWS).fill(null).map(() => Array(COLS).fill(0));
-                this.currentPiece = null;
-                this.currentX = 0;
-                this.currentY = 0;
-                this.score = 0;
-                this.lines = 0;
-                this.level = 1;
-                this.gameRunning = true;
-                this.gamePaused = false;
-                this.gameOver = false;
-                
-                this.boardElement = document.getElementById('gameBoard');
-                this.initBoard();
-                this.spawnPiece();
-                this.startGameLoop();
-                this.setupKeyboard();
-            }
+        <article class="project-card">
+          <div class="project-index">01</div>
+          <h3 class="project-name">Open City</h3>
+          <p class="project-desc">Urban infrastructure platform connecting municipalities with residents for transparent civic operations.</p>
+          <div class="project-tags">
+            <span class="tag">civic tech</span>
+            <span class="tag">SaaS</span>
+          </div>
+        </article>
 
-            initBoard() {
-                this.boardElement.innerHTML = '';
-                for (let r = 0; r < ROWS; r++) {
-                    for (let c = 0; c < COLS; c++) {
-                        const cell = document.createElement('div');
-                        cell.className = 'cell';
-                        cell.id = `cell-${r}-${c}`;
-                        this.boardElement.appendChild(cell);
-                    }
-                }
-            }
+        <article class="project-card">
+          <div class="project-index">02</div>
+          <h3 class="project-name">Foundation</h3>
+          <p class="project-desc">Nonprofit fundraising and grant management with donor analytics and campaign tracking.</p>
+          <div class="project-tags">
+            <span class="tag">nonprofit</span>
+            <span class="tag">fintech</span>
+          </div>
+        </article>
 
-            spawnPiece() {
-                const shapeKeys = Object.keys(SHAPES);
-                const randomShape = shapeKeys[Math.floor(Math.random() * shapeKeys.length)];
-                this.currentPiece = SHAPES[randomShape];
-                this.currentX = Math.floor(COLS / 2) - 1;
-                this.currentY = 0;
+        <article class="project-card">
+          <div class="project-index">03</div>
+          <h3 class="project-name">TeachFlow</h3>
+          <p class="project-desc">Learning management system with adaptive curriculum tools and real-time progress dashboards.</p>
+          <div class="project-tags">
+            <span class="tag">edtech</span>
+            <span class="tag">LMS</span>
+          </div>
+        </article>
 
-                if (!this.canPlacePiece(this.currentX, this.currentY, this.currentPiece.blocks)) {
-                    this.gameOver = true;
-                    this.endGame();
-                }
-            }
+        <article class="project-card">
+          <div class="project-index">04</div>
+          <h3 class="project-name">Matrix CRM</h3>
+          <p class="project-desc">Customer relationship suite with pipeline visualisation, automation, and deal analytics.</p>
+          <div class="project-tags">
+            <span class="tag">CRM</span>
+            <span class="tag">analytics</span>
+          </div>
+        </article>
 
-            canPlacePiece(x, y, blocks) {
-                for (let r = 0; r < blocks.length; r++) {
-                    for (let c = 0; c < blocks[r].length; c++) {
-                        if (blocks[r][c]) {
-                            const newX = x + c;
-                            const newY = y + r;
-                            if (newX < 0 || newX >= COLS || newY >= ROWS) return false;
-                            if (newY >= 0 && this.board[newY][newX]) return false;
-                        }
-                    }
-                }
-                return true;
-            }
+        <article class="project-card">
+          <div class="project-index">05</div>
+          <h3 class="project-name">Otdushi Menu</h3>
+          <p class="project-desc">Digital menu and ordering platform for restaurants — QR-first, mobile-optimised, multi-language.</p>
+          <div class="project-tags">
+            <span class="tag">hospitality</span>
+            <span class="tag">product</span>
+          </div>
+        </article>
 
-            placePiece() {
-                const blocks = this.currentPiece.blocks;
-                for (let r = 0; r < blocks.length; r++) {
-                    for (let c = 0; c < blocks[r].length; c++) {
-                        if (blocks[r][c]) {
-                            const y = this.currentY + r;
-                            const x = this.currentX + c;
-                            if (y >= 0 && y < ROWS && x >= 0 && x < COLS) {
-                                this.board[y][x] = 1;
-                            }
-                        }
-                    }
-                }
-                this.clearLines();
-                this.spawnPiece();
-            }
+      </div>
+    </section>
 
-            clearLines() {
-                let linesCleared = 0;
-                for (let r = ROWS - 1; r >= 0; r--) {
-                    if (this.board[r].every(cell => cell)) {
-                        this.board.splice(r, 1);
-                        this.board.unshift(Array(COLS).fill(0));
-                        linesCleared++;
-                    }
-                }
-                if (linesCleared > 0) {
-                    this.lines += linesCleared;
-                    this.score += linesCleared * 100 * this.level;
-                    this.level = Math.floor(this.lines / 10) + 1;
-                    this.updateUI();
-                }
-            }
+  </main>
 
-            moveLeft() {
-                if (this.canPlacePiece(this.currentX - 1, this.currentY, this.currentPiece.blocks)) {
-                    this.currentX--;
-                }
-            }
+  <footer class="site-footer">
+    &copy; <span id="footerYear"></span> <em>Aleksei</em>
+  </footer>
 
-            moveRight() {
-                if (this.canPlacePiece(this.currentX + 1, this.currentY, this.currentPiece.blocks)) {
-                    this.currentX++;
-                }
-            }
+</div><!-- .page -->
 
-            moveDown() {
-                if (this.canPlacePiece(this.currentX, this.currentY + 1, this.currentPiece.blocks)) {
-                    this.currentY++;
-                } else {
-                    this.placePiece();
-                }
-            }
+<script>
+(function () {
+  'use strict';
 
-            dropPiece() {
-                while (this.canPlacePiece(this.currentX, this.currentY + 1, this.currentPiece.blocks)) {
-                    this.currentY++;
-                }
-                this.placePiece();
-            }
+  /* ─────────────────────────────────
+     STAR PARTICLES
+  ───────────────────────────────── */
+  const canvas = document.getElementById('starsCanvas');
+  const ctx    = canvas.getContext('2d');
+  let stars    = [];
 
-            rotatePiece() {
-                const blocks = this.currentPiece.blocks;
-                const rotated = [];
-                for (let c = 0; c < blocks[0].length; c++) {
-                    const row = [];
-                    for (let r = blocks.length - 1; r >= 0; r--) {
-                        row.push(blocks[r][c]);
-                    }
-                    rotated.push(row);
-                }
-                if (this.canPlacePiece(this.currentX, this.currentY, rotated)) {
-                    this.currentPiece.blocks = rotated;
-                }
-            }
+  function rnd(a, b) { return a + Math.random() * (b - a); }
 
-            draw() {
-                // Clear the board display
-                for (let r = 0; r < ROWS; r++) {
-                    for (let c = 0; c < COLS; c++) {
-                        const cell = document.getElementById(`cell-${r}-${c}`);
-                        cell.classList.remove('filled', 'falling');
-                        if (this.board[r][c]) {
-                            cell.classList.add('filled');
-                        }
-                    }
-                }
+  function initStars() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    stars = Array.from({ length: 150 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: rnd(0.4, 1.8),
+      vx: rnd(-0.05, 0.05),
+      vy: rnd(0.02, 0.1),
+      o: rnd(0.2, 0.85),
+    }));
+  }
 
-                // Draw current piece
-                const blocks = this.currentPiece.blocks;
-                for (let r = 0; r < blocks.length; r++) {
-                    for (let c = 0; c < blocks[r].length; c++) {
-                        if (blocks[r][c]) {
-                            const y = this.currentY + r;
-                            const x = this.currentX + c;
-                            if (y >= 0 && y < ROWS && x >= 0 && x < COLS) {
-                                const cell = document.getElementById(`cell-${y}-${x}`);
-                                cell.classList.add('falling');
-                            }
-                        }
-                    }
-                }
-            }
+  function tick() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const s of stars) {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200,225,255,${s.o})`;
+      ctx.fill();
+      s.x += s.vx;
+      s.y += s.vy;
+      if (s.y > canvas.height) { s.y = -2; s.x = Math.random() * canvas.width; }
+      if (s.x < 0)              s.x = canvas.width;
+      if (s.x > canvas.width)   s.x = 0;
+    }
+    requestAnimationFrame(tick);
+  }
 
-            updateUI() {
-                document.getElementById('score').textContent = this.score;
-                document.getElementById('level').textContent = this.level;
-                document.getElementById('lines').textContent = this.lines;
-            }
+  initStars();
+  tick();
 
-            startGameLoop() {
-                let dropCounter = 0;
-                const dropInterval = Math.max(100, 500 - (this.level - 1) * 50);
+  let rsz;
+  window.addEventListener('resize', () => { clearTimeout(rsz); rsz = setTimeout(initStars, 150); });
 
-                const gameLoop = setInterval(() => {
-                    if (this.gameOver) {
-                        clearInterval(gameLoop);
-                        return;
-                    }
+  /* ─────────────────────────────────
+     WAR TIMER
+  ───────────────────────────────── */
+  const WAR_START = new Date('2022-02-24T00:00:00+02:00').getTime();
 
-                    if (!this.gamePaused) {
-                        dropCounter++;
-                        if (dropCounter >= dropInterval / 50) {
-                            this.moveDown();
-                            dropCounter = 0;
-                        }
-                        this.draw();
-                    }
-                }, 50);
-            }
+  const elY = document.getElementById('warYears');
+  const elD = document.getElementById('warDays');
+  const elH = document.getElementById('warHours');
+  const elM = document.getElementById('warMinutes');
+  const elS = document.getElementById('warSeconds');
 
-            setupKeyboard() {
-                document.addEventListener('keydown', (e) => {
-                    if (this.gameOver || this.gamePaused) return;
-                    
-                    switch (e.key) {
-                        case 'ArrowLeft':
-                            e.preventDefault();
-                            this.moveLeft();
-                            break;
-                        case 'ArrowRight':
-                            e.preventDefault();
-                            this.moveRight();
-                            break;
-                        case 'ArrowDown':
-                            e.preventDefault();
-                            this.moveDown();
-                            break;
-                        case ' ':
-                            e.preventDefault();
-                            this.dropPiece();
-                            break;
-                        case 'ArrowUp':
-                        case 'z':
-                            e.preventDefault();
-                            this.rotatePiece();
-                            break;
-                    }
-                });
-            }
+  function pad(n, len) { return String(n).padStart(len, '0'); }
 
-            togglePause() {
-                if (!this.gameOver) {
-                    this.gamePaused = !this.gamePaused;
-                }
-            }
+  function tickWar() {
+    const ms        = Date.now() - WAR_START;
+    const totalSec  = Math.floor(ms / 1000);
+    const totalMin  = Math.floor(totalSec / 60);
+    const totalHr   = Math.floor(totalMin / 60);
+    const totalDays = Math.floor(totalHr / 24);
 
-            endGame() {
-                document.getElementById('finalScore').textContent = this.score;
-                document.getElementById('gameOver').classList.add('show');
-            }
+    const years = Math.floor(totalDays / 365);
+    const days  = totalDays % 365;
+    const hrs   = totalHr   % 24;
+    const mins  = totalMin  % 60;
+    const secs  = totalSec  % 60;
 
-            resetGame() {
-                this.board = Array(ROWS).fill(null).map(() => Array(COLS).fill(0));
-                this.score = 0;
-                this.lines = 0;
-                this.level = 1;
-                this.gameOver = false;
-                this.gamePaused = false;
-                document.getElementById('gameOver').classList.remove('show');
-                this.updateUI();
-                this.spawnPiece();
-                this.draw();
-                this.startGameLoop();
-            }
-        }
+    elY.textContent = pad(years, 1);
+    elD.textContent = pad(days,  3);
+    elH.textContent = pad(hrs,   2);
+    elM.textContent = pad(mins,  2);
+    elS.textContent = pad(secs,  2);
+  }
 
-        const game = new TetrisGame();
-        game.updateUI();
-        game.draw();
-    </script>
+  tickWar();
+  setInterval(tickWar, 1000);
+
+  /* ─────────────────────────────────
+     CRYPTO RATES
+  ───────────────────────────────── */
+  const COINS = {
+    bitcoin:  { el: 'coin-bitcoin'  },
+    ethereum: { el: 'coin-ethereum' },
+    solana:   { el: 'coin-solana'   },
+  };
+  const API = 'https://api.coingecko.com/api/v3/simple/price' +
+              '?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true';
+  const statusEl = document.getElementById('cryptoStatus');
+
+  function fmtPrice(usd) {
+    if (usd >= 1000) return '$' + usd.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    if (usd >= 1)    return '$' + usd.toFixed(2);
+    return '$' + usd.toFixed(4);
+  }
+
+  function fmtChg(pct) {
+    return (pct >= 0 ? '▲ +' : '▼ ') + Math.abs(pct).toFixed(2) + '%';
+  }
+
+  function applyCard(coinId, usd, pct) {
+    const card = document.getElementById(COINS[coinId].el);
+    if (!card) return;
+    card.querySelector('.crypto-price').textContent  = fmtPrice(usd);
+    const chEl = card.querySelector('.crypto-change');
+    chEl.textContent = fmtChg(pct);
+    chEl.className   = 'crypto-change ' + (pct >= 0 ? 'up' : 'down');
+    card.classList.remove('skeleton');
+  }
+
+  async function fetchCrypto() {
+    try {
+      const res  = await fetch(API);
+      if (!res.ok) throw new Error(res.status);
+      const data = await res.json();
+      // data = { bitcoin: { usd, usd_24h_change }, ... }
+      for (const [id] of Object.entries(COINS)) {
+        const coin = data[id];
+        if (coin) applyCard(id, coin.usd, coin.usd_24h_change ?? 0);
+      }
+      const now = new Date();
+      statusEl.textContent = `upd ${pad(now.getHours(),2)}:${pad(now.getMinutes(),2)}`;
+      statusEl.className   = 'crypto-status ok';
+    } catch {
+      statusEl.textContent = 'offline';
+      statusEl.className   = 'crypto-status error';
+    }
+  }
+
+  fetchCrypto();
+  setInterval(fetchCrypto, 60_000);
+
+  /* ─────────────────────────────────
+     FOOTER YEAR
+  ───────────────────────────────── */
+  document.getElementById('footerYear').textContent = new Date().getFullYear();
+
+})();
+</script>
 </body>
 </html>
